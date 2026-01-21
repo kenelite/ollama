@@ -835,7 +835,7 @@ func ListHandler(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func DumpHandler(cmd *cobra.Command, args []string) error {
+func ExportHandler(cmd *cobra.Command, args []string) error {
 	client, err := api.ClientFromEnvironment()
 	if err != nil {
 		return err
@@ -865,7 +865,7 @@ func DumpHandler(cmd *cobra.Command, args []string) error {
 	}
 
 	// Write header comment
-	fmt.Fprintf(writer, "# Ollama models dump\n")
+	fmt.Fprintf(writer, "# Ollama models export\n")
 	fmt.Fprintf(writer, "# Generated at: %s\n", time.Now().Format(time.RFC3339))
 	fmt.Fprintf(writer, "# Use 'ollama pull -r <file>' to restore these models\n")
 	fmt.Fprintf(writer, "#\n")
@@ -2062,21 +2062,23 @@ func NewCLI() *cobra.Command {
 		RunE:    ListHandler,
 	}
 
-	dumpCmd := &cobra.Command{
-		Use:     "dump",
+
+	exportCmd := &cobra.Command{
+		Use:     "export",
 		Aliases: []string{"freeze"},
-		Short:   "Dump installed models list to stdout or file (for environment migration)",
-		Long: `Dump the list of installed models to stdout or a file.
+		Short:   "Export installed models list to stdout or file (for environment migration)",
+		Long: `Export the list of installed models to stdout or a file.
 This can be used for environment migration similar to 'pip freeze'.
 
 Examples:
-  ollama dump                     # Print models list to stdout
-  ollama dump -o models.txt       # Save models list to a file
-  ollama pull -r models.txt       # Restore models from a dump file`,
+  ollama export                   # Print models list to stdout
+  ollama export -o models.txt     # Save models list to a file
+  ollama pull -r models.txt       # Restore models from an export file`,
 		PreRunE: checkServerHeartbeat,
-		RunE:    DumpHandler,
+		RunE:    ExportHandler,
 	}
-	dumpCmd.Flags().StringP("output", "o", "", "Output file path (default: stdout)")
+	exportCmd.Flags().StringP("output", "o", "", "Output file path (default: stdout)")
+
 
 	psCmd := &cobra.Command{
 		Use:     "ps",
@@ -2124,7 +2126,7 @@ Examples:
 		pullCmd,
 		pushCmd,
 		listCmd,
-		dumpCmd,
+		exportCmd,
 		psCmd,
 		copyCmd,
 		deleteCmd,
@@ -2169,7 +2171,7 @@ Examples:
 		signinCmd,
 		signoutCmd,
 		listCmd,
-		dumpCmd,
+		exportCmd,
 		psCmd,
 		copyCmd,
 		deleteCmd,
